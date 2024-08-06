@@ -13,6 +13,8 @@ spec:
     matchLabels:
       app: grafana
       component: core
+   strategy:
+    type: Recreate
   template:
     metadata:
       labels:
