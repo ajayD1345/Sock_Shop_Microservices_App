@@ -3,10 +3,10 @@ kind: Ingress
 metadata:
   name: socks-shop-ingress
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
 spec:
   rules:
-  - host: your-domain.com
+  - host: foxcastor.com.ng
     http:
       paths:
       - path: /
@@ -18,6 +18,6 @@ spec:
               number: 80
   tls:
   - hosts:
-    - your-domain.com
+    - foxcastor.com.ng
     secretName: letsencrypt
 
