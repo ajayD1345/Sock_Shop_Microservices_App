@@ -10,29 +10,6 @@ There are two issuer files in this directory. The `staging-issuer.yml` file is u
 
 ## Testing
 
-To test the issuer files, you can deploy them to your Kubernetes cluster using the following command:
-
-```bash
-kubectl apply -f 1-issuer-staging.yml
-```
-
-When the staging issuer is deployed to the cluster, you can use the SSL/TLS certificate for your website. This is done by adding the following annotations to your Ingress resource:
-
-```yaml
-metadata:
-  annotations:
-    cert-manager.io/issuer: staging
-```
-
-and an extra tls block to your Ingress resource:
-
-```yaml
-spec:
-  tls:
-  - hosts:
-    - example.com
-    secre
-
 When the production issuer is deployed to the cluster, you can use the SSL/TLS certificate for your website. This is done by adding the following annotations to your Ingress resource:
 
 ```yaml
