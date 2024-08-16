@@ -57,7 +57,7 @@ jobs:
       - name: Terraform setup and apply
         if: ${{ github.event.inputs.action == 'build' }}
         run: |
-          if [ -d "infrastructure" ]; then
+          if [ -d "terraform" ]; then
             cd infrastructure && \
             terraform init && \
             terraform validate && \
