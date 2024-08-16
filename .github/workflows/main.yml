@@ -235,11 +235,9 @@ jobs:
       - name: Terraform destroy 
         if: ${{ github.event.inputs.action == 'cleanup' }}
         run: |
-          if [ -d "terraform" ]; then
             cd terraform && \
             terraform init && \
             terraform destroy -auto-approve
-          else
-            echo "The 'terraform' directory does not exist."
-            exit 1
-          fi
+        
+    
+          
