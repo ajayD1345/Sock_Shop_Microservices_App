@@ -26,7 +26,7 @@ The production certificate is trusted by browsers, so you will not see a warning
 
 Screenshot of the secure website:
 
-![production-certificate-secure](.img/secure-page.png)
+(.img/Screenshot from 2024-08-16 01-13-01.png)
 
 **Note:** The commands above contains file names and configurations that are specific to this repository. You may need to modify the commands to match your environment.
 
