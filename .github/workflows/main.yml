@@ -64,7 +64,7 @@ jobs:
             terraform plan -out=tfplan && \
             terraform apply tfplan
           else
-            echo "The 'infrastructure' directory does not exist."
+            echo "The 'terraform' directory does not exist."
             exit 1
           fi
 
@@ -239,11 +239,11 @@ jobs:
       - name: Terraform destroy (infrastructure)
         if: ${{ github.event.inputs.action == 'cleanup' }}
         run: |
-          if [ -d "infrastructure" ]; then
+          if [ -d "terraform" ]; then
             cd infrastructure && \
             terraform init && \
             terraform destroy -auto-approve
           else
-            echo "The 'infrastructure' directory does not exist."
+            echo "The 'terraform' directory does not exist."
             exit 1
           fi
