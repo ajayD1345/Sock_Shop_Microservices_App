@@ -34,31 +34,8 @@ Here are screenshots of the deploy sock-shop microservices application:
 
 ### Homepage
 
-![sock-shop-home](.img/homepage.png)
+![sock-shop-home](.img/Screenshot from 2024-08-16 01-13-01.png)
 
-### Catalogue
-
-![sock-shop-catalogue](.img/catalogue.png)
-
-### Login Page
-
-![sock-shop-login](.img/login.png)
-
-### Cart
-
-![sock-shop-cart](.img/cart.png)
-
-### Checkout
-
-![sock-shop-checkout](.img/orders.png)
-
-### Twitter icon
-
-![sock-shop-twitter](.img/twittericon.png)
-
-### Mailing icon
-
-![sock-shop-mailing](.img/emailicon.png)
 
 ## Conclusion
 
