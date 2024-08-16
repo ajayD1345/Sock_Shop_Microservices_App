@@ -9,6 +9,7 @@ This project is about deploying a micro-services architectural web-application c
 - Prometues-stack: for monitoring the services.
 
 - eck-stack: for logging.
+  ## to get the steps to know how to execute this projest go to the .github and read the readme  for a better understanding.
 
 # Prerequicite
  Before you start with this project you must have;
