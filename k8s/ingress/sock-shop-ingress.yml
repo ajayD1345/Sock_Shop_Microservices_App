@@ -1,16 +1,18 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: socks-shop-ingress
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+  name: sock-shop
+  namespace: sock-shop
+  annotations: 
+   cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
+  ingressClassName: nginx
   rules:
-  - host: foxcastor.com.ng
+  - host:   www.foxcastor.com.ng
     http:
       paths:
-      - path: /
-        pathType: Prefix
+      - pathType: Prefix
+        path: /
         backend:
           service:
             name: front-end
@@ -18,6 +20,6 @@ spec:
               number: 80
   tls:
   - hosts:
-    - foxcastor.com.ng
-    secretName: letsencrypt
+    - www.foxcastor.com.ng
+    secretName: letsencrypt-prod-cert
 
