@@ -129,7 +129,7 @@ jobs:
       - name: Apply deployments YAML
         if: ${{ github.event.inputs.action == 'build' }}
         run: |
-          cd k8s/deployments/manifest && \
+          cd k8s/deployments/manifests && \
           attempt=1 && \
           until kubectl apply -f .; do
             if [ $attempt -eq 2 ]; then
