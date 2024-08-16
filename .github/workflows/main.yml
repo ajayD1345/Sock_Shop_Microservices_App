@@ -66,7 +66,7 @@ jobs:
 
       - name: Wait for EKS cluster to be ready
         if: ${{ github.event.inputs.action == 'build' }}
-        run: sleep 10m
+        run: sleep 10
 
       - name: Get EKS credentials
         if: ${{ github.event.inputs.action == 'build' }}
@@ -95,7 +95,7 @@ jobs:
       - name: Apply letsencrypt yml
         if: ${{ github.event.inputs.action == 'build' }}
         run: |
-          cd k8s/letencrypt && \
+          cd k8s/letsencrypt && \
           attempt=1 && \
           until kubectl apply -f .; do
             if [ $attempt -eq 2 ]; then
