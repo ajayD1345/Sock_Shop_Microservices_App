@@ -169,7 +169,7 @@ jobs:
         run: |
           cd k8s/monitoring/kube-prometheus-crd && \
           attempt=1 && \
-          until kubectl apply -f .; do
+          until kubectl create -f .; do
             if [ $attempt -eq 2 ]; then
               echo "Failed to apply kube-prometheus-crd after 2 attempts"
               exit 1
@@ -188,7 +188,7 @@ jobs:
         run: |
           cd k8s/monitoring/kube-prometheus-dep && \
           attempt=1 && \
-          until kubectl apply -f .; do
+          until kubectl create -f .; do
             if [ $attempt -eq 2 ]; then
               echo "Failed to apply kube-prometheus-dep yml after 2 attempts"
               exit 1
@@ -222,7 +222,7 @@ jobs:
         run: |
           cd k8s/logging/efk-logging && \
           attempt=1 && \
-          until kubectl apply -f .; do
+          until kubectl create -f .; do
             if [ $attempt -eq 2 ]; then
               echo "Failed to apply logging yml after 2 attempts"
               exit 1
