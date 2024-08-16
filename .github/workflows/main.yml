@@ -232,11 +232,11 @@ jobs:
             ((attempt++))
           done
 
-      - name: Terraform destroy (infrastructure)
+      - name: Terraform destroy 
         if: ${{ github.event.inputs.action == 'cleanup' }}
         run: |
           if [ -d "terraform" ]; then
-            cd infrastructure && \
+            cd terraform && \
             terraform init && \
             terraform destroy -auto-approve
           else
