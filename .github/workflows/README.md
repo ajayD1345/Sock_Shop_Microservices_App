@@ -86,7 +86,7 @@ By following these steps, you can effectively deploy and manage the Sock-shop ap
 
 ### Workflow Dispatch with Build Action
 
-![Workflow Dispatch with Build Action](img/Screenshot from 2024-08-16 16-44-53.png)
+![Workflow Dispatch with Build Action].(img/Screenshot from 2024-08-16 16-44-53.png)
 
 ![Workflow Dispatch with Build Action](img/Screenshot from 2024-08-16 16-45-07.png)
 
