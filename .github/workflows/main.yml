@@ -1,0 +1,255 @@
+name: Deploy Sockshop on EKS
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Action to perform
+        required: true
+        default: build
+        type: choice
+        options:
+          - build
+          - cleanup
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        if: ${{ github.event.inputs.action == 'build' }}
+        uses: actions/checkout@v2
+
+      - name: Install AWS CLI
+        if: ${{ github.event.inputs.action == 'build' }}
+        uses: aws-actions/configure-aws-cli@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: Install necessary tools
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl unzip wget apt-transport-https gnupg2 software-properties-common git ca-certificates
+
+      - name: Install Terraform
+        if: ${{ github.event.inputs.action == 'build' }}
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.7.5
+
+      - name: Install kubectl
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: |
+          sudo snap install kubectl --classic
+
+      - name: Install Helm
+        if: ${{ github.event.inputs.action == 'build' }}
+        uses: Azure/setup-helm@v4
+        with:
+          version: v3.7.0
+
+      - name: Configure AWS credentials
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: |
+          aws sts get-caller-identity
+
+      - name: Terraform setup and apply
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: |
+          if [ -d "infrastructure" ]; then
+            cd infrastructure && \
+            terraform init && \
+            terraform validate && \
+            terraform plan -out=tfplan && \
+            terraform apply tfplan
+          else
+            echo "The 'infrastructure' directory does not exist."
+            exit 1
+          fi
+
+      - name: Wait for EKS cluster to be ready
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: sleep 10m
+
+      - name: Get EKS credentials
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: |
+          aws eks update-kubeconfig --region us-east-2 --name clusterbox
+
+      - name: Apply cert-manager yml
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: |
+          cd k8s/cert-manager && \
+          attempt=1 && \
+          until kubectl apply -f .; do
+            if [ $attempt -eq 2 ]; then
+              echo "Failed to apply cert-manager yml after 2 attempts"
+              exit 1
+            fi
+            echo "Retrying applying cert-manager yml (attempt $attempt)"
+            sleep 40
+            ((attempt++))
+          done
+
+      - name: Wait for cert-manager yml to be ready
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: sleep 40
+
+      - name: Apply letsencrypt yml
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: |
+          cd k8s/letencrypt && \
+          attempt=1 && \
+          until kubectl apply -f .; do
+            if [ $attempt -eq 2 ]; then
+              echo "Failed to apply letsencrypt yml after 2 attempts"
+              exit 1
+            fi
+            echo "Retrying applying letsencrypt yml (attempt $attempt)"
+            sleep 10
+            ((attempt++))
+          done
+
+      - name: Apply ingress-controller yml
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: |
+          cd k8s/ingress/ingress-controller && \
+          attempt=1 && \
+          until kubectl apply -f .; do
+            if [ $attempt -eq 2 ]; then
+              echo "Failed to apply ingress-controller yml after 2 attempts"
+              exit 1
+            fi
+            echo "Retrying applying ingress-controller yml (attempt $attempt)"
+            sleep 30
+            ((attempt++))
+          done
+
+      - name: Wait for ingress-controller to be ready
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: sleep 30
+
+      - name: Apply deployments YAML
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: |
+          cd k8s/deployments/manifest && \
+          attempt=1 && \
+          until kubectl apply -f .; do
+            if [ $attempt -eq 2 ]; then
+              echo "Failed to apply deployments YAML after 2 attempts"
+              exit 1
+            fi
+            echo "Retrying applying deployments YAML (attempt $attempt)"
+            sleep 30
+            ((attempt++))
+          done
+
+      - name: Wait for deployments YAML to be ready
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: sleep 30
+
+      - name: Apply sock-shop.yml
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: |
+          cd k8s/ingress && \
+          attempt=1 && \
+          until kubectl apply -f sock-shop-ingress.yml; do
+            if [ $attempt -eq 2 ]; then
+              echo "Failed to apply sock-shop.yml after 2 attempts"
+              exit 1
+            fi
+            echo "Retrying applying sock-shop.yml (attempt $attempt)"
+            sleep 10
+            ((attempt++))
+          done
+
+      - name: Wait for 10 seconds before applying monitoring yml
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: sleep 10
+
+      - name: Apply kube-prometheus-crd
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: |
+          cd k8s/monitoring/kube-prometheus-crd && \
+          attempt=1 && \
+          until kubectl apply -f .; do
+            if [ $attempt -eq 2 ]; then
+              echo "Failed to apply kube-prometheus-crd after 2 attempts"
+              exit 1
+            fi
+            echo "Retrying applying kube-prometheus-crd (attempt $attempt)"
+            sleep 20
+            ((attempt++))
+          done
+
+      - name: Wait for 20 seconds before applying kube-prometheus-dep
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: sleep 20
+
+      - name: Apply kube-prometheus-dep yml
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: |
+          cd k8s/monitoring/kube-prometheus-dep && \
+          attempt=1 && \
+          until kubectl apply -f .; do
+            if [ $attempt -eq 2 ]; then
+              echo "Failed to apply kube-prometheus-dep yml after 2 attempts"
+              exit 1
+            fi
+            echo "Retrying applying kube-prometheus-dep yml (attempt $attempt)"
+            sleep 60
+            ((attempt++))
+          done
+
+      - name: Wait for 60 seconds before applying ingress.yml
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: sleep 60
+
+      - name: Apply ingress.yml
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: |
+          cd k8s/monitoring && \
+          attempt=1 && \
+          until kubectl apply -f ingress.yml; do
+            if [ $attempt -eq 2 ]; then
+              echo "Failed to apply ingress.yml after 2 attempts"
+              exit 1
+            fi
+            echo "Retrying applying ingress.yml (attempt $attempt)"
+            sleep 10
+            ((attempt++))
+          done
+
+      - name: Apply logging yml
+        if: ${{ github.event.inputs.action == 'build' }}
+        run: |
+          cd k8s/logging/efk-logging && \
+          attempt=1 && \
+          until kubectl apply -f .; do
+            if [ $attempt -eq 2 ]; then
+              echo "Failed to apply logging yml after 2 attempts"
+              exit 1
+            fi
+            echo "Retrying applying logging yml (attempt $attempt)"
+            sleep 20
+            ((attempt++))
+          done
+
+      - name: Terraform destroy (infrastructure)
+        if: ${{ github.event.inputs.action == 'cleanup' }}
+        run: |
+          if [ -d "infrastructure" ]; then
+            cd infrastructure && \
+            terraform init && \
+            terraform destroy -auto-approve
+          else
+            echo "The 'infrastructure' directory does not exist."
+            exit 1
+          fi
