@@ -1,8 +1,27 @@
-## Cert-manager
-This folder contain the  cert-manager manifest file for deploying cert-manager on your kubernetes cluster.
+## Cert-Manager
 
-## steps to use this file 
-- make sure you have the nessecary tools installed on your server
-- then you use the 'kubectl create -f cert-manager.yml' to create or 'kubectl apply -f cert-manager' to apply the file on your cluster.
-- then you use this command to verify if its deployed 'kubectl get pods --namespace cert-manager'.
-- once you've checked and everything is fine and running, that means the creation of cert-manger is complete and you can start with letsencrypt.
+This folder contains the manifest file for deploying Cert-Manager on your Kubernetes cluster.
+
+### Steps to Use This File
+
+1. **Ensure Prerequisites:** Make sure you have the necessary tools installed on your server.
+   
+2. **Deploy Cert-Manager:**
+   Use the following command to create or apply the Cert-Manager manifest:
+
+   ```bash
+   kubectl apply -f cert-manager.yml
+   ```
+   Alternatively, you can use:
+
+   ```bash
+   kubectl create -f cert-manager.yml
+   ```
+3. Verify Deployment:
+Check the status of Cert-Manager to ensure it is deployed correctly:
+
+```bash
+kubectl get pods --namespace cert-manager
+```
+# Completion
+Once you confirm that all pods are running as expected, the deployment of Cert-Manager is complete. You can then proceed to deploy Let's Encrypt.
