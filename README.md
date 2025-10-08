@@ -1,4 +1,4 @@
-# Capstone Project
+# Sock_Shop_Microservices_App
 
 This project involves deploying a microservices-based web application called Sock Shop on Kubernetes using Infrastructure as Code (IaC) tools like Terraform and Ansible. The infrastructure is managed on Amazon Web Services (AWS) Elastic Kubernetes Service (EKS). Additionally, tools like Prometheus Stack and ECK Stack are used for monitoring and logging, while Cert-Manager and Let's Encrypt secure the application on the internet.
 
